@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
-import { Project, Workflow, Task, Blueprint, DiscoveredTool, McpServer, AgentNode } from '@/types/orchestrator';
+import {
+    Project,
+    Workflow,
+    Task,
+    Blueprint,
+    DiscoveredTool,
+    McpServer,
+    AgentNode,
+} from '@/types/orchestrator';
 import { WorkflowCanvas } from '@/components/orchestrator/WorkflowCanvas';
 import { TaskBoard } from '@/components/orchestrator/TaskBoard';
 import { TaskInspector } from '@/components/orchestrator/TaskInspector';
@@ -48,14 +56,20 @@ export default function WorkspaceIndex({
     mcpServers,
     reverb,
 }: Props) {
-    const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'mcp'>('board');
+    const [activeTab, setActiveTab] = useState<'canvas' | 'board' | 'mcp'>(
+        'board',
+    );
     const [currentProject, setCurrentProject] = useState<Project>(project);
-    const [currentWorkflow, setCurrentWorkflow] = useState<Workflow>(initialCurrentWorkflow);
+    const [currentWorkflow, setCurrentWorkflow] = useState<Workflow>(
+        initialCurrentWorkflow,
+    );
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
-    const [settingsTab, setSettingsTab] = useState<'ai' | 'search' | 'workspace'>('ai');
+    const [settingsTab, setSettingsTab] = useState<
+        'ai' | 'search' | 'workspace'
+    >('ai');
 
     useEffect(() => {
         setCurrentProject(project);
@@ -74,7 +88,9 @@ export default function WorkspaceIndex({
         const workflowChannel = echo.channel(`workflow.${currentWorkflow.id}`);
         workflowChannel.listen('.task.status_updated', (data: any) => {
             setTasks((prevTasks) =>
-                prevTasks.map((t) => (t.id === data.id ? { ...t, ...data } : t))
+                prevTasks.map((t) =>
+                    t.id === data.id ? { ...t, ...data } : t,
+                ),
             );
 
             if (selectedTask?.id === data.id) {
@@ -100,7 +116,9 @@ export default function WorkspaceIndex({
             setSelectedTask((prev) => {
                 if (!prev) return null;
                 const runs = prev.runs ? [...prev.runs] : [];
-                let targetRun = runs.find((r) => r.id === newEvent.agent_run_id);
+                let targetRun = runs.find(
+                    (r) => r.id === newEvent.agent_run_id,
+                );
 
                 if (!targetRun) {
                     targetRun = {
@@ -109,7 +127,8 @@ export default function WorkspaceIndex({
                         agent_node_id: prev.assigned_node_id || '',
                         status: 'running',
                         events: [],
-                        created_at: newEvent.created_at || new Date().toISOString(),
+                        created_at:
+                            newEvent.created_at || new Date().toISOString(),
                     } as any;
                     runs.push(targetRun);
                 }
@@ -118,8 +137,10 @@ export default function WorkspaceIndex({
                 const existingIdx = events.findIndex(
                     (e) =>
                         e.id === newEvent.id ||
-                        (e.id?.toString().startsWith('optimistic-') && e.payload?.text === newEvent.payload?.text) ||
-                        (e.sequence === newEvent.sequence && e.event_type === newEvent.event_type)
+                        (e.id?.toString().startsWith('optimistic-') &&
+                            e.payload?.text === newEvent.payload?.text) ||
+                        (e.sequence === newEvent.sequence &&
+                            e.event_type === newEvent.event_type),
                 );
 
                 if (existingIdx >= 0) {
@@ -140,7 +161,9 @@ export default function WorkspaceIndex({
                 approvals.push(newApproval);
                 return { ...prev, approvals, status: 'awaiting_approval' };
             });
-            toast.warning(`Approval required for tool ${newApproval.tool_name}`);
+            toast.warning(
+                `Approval required for tool ${newApproval.tool_name}`,
+            );
         });
 
         return () => {
@@ -155,9 +178,12 @@ export default function WorkspaceIndex({
 
     const handleSaveWorkflow = async (
         nodes: AgentNode[],
-        edges: { source: string; target: string; label?: string }[]
+        edges: { source: string; target: string; label?: string }[],
     ) => {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content') || '';
         const res = await fetch(`/api/workflows/${currentWorkflow.id}`, {
             method: 'POST',
             headers: {
@@ -170,7 +196,9 @@ export default function WorkspaceIndex({
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Falha ao salvar workflow no servidor');
+            throw new Error(
+                errorData.message || 'Falha ao salvar workflow no servidor',
+            );
         }
 
         const data = await res.json();
@@ -182,7 +210,10 @@ export default function WorkspaceIndex({
     const handleCreateTask = async (taskData: any) => {
         const res = await fetch(`/api/projects/${project.id}/tasks`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
             body: JSON.stringify(taskData),
         });
 
@@ -198,7 +229,9 @@ export default function WorkspaceIndex({
         const optimisticId = `optimistic-${Date.now()}`;
         const optimisticEvent: any = {
             id: optimisticId,
-            agent_run_id: selectedTask?.runs?.[selectedTask.runs.length - 1]?.id || 'optimistic',
+            agent_run_id:
+                selectedTask?.runs?.[selectedTask.runs.length - 1]?.id ||
+                'optimistic',
             task_id: taskId,
             sequence: 99999,
             event_type: 'user_message',
@@ -208,7 +241,10 @@ export default function WorkspaceIndex({
 
         setSelectedTask((prev) => {
             if (!prev) return null;
-            const runs = prev.runs && prev.runs.length > 0 ? [...prev.runs] : [{ id: 'run-1', events: [] } as any];
+            const runs =
+                prev.runs && prev.runs.length > 0
+                    ? [...prev.runs]
+                    : [{ id: 'run-1', events: [] } as any];
             const latestRun = runs[runs.length - 1];
             latestRun.events = [...(latestRun.events || []), optimisticEvent];
             return { ...prev, status: 'queued', runs };
@@ -216,7 +252,10 @@ export default function WorkspaceIndex({
 
         const res = await fetch(`/api/tasks/${taskId}/messages`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
             body: JSON.stringify({ message }),
         });
 
@@ -228,7 +267,9 @@ export default function WorkspaceIndex({
                     const runs = prev.runs ? [...prev.runs] : [];
                     runs.forEach((r) => {
                         if (r.events) {
-                            r.events = r.events.map((e) => (e.id === optimisticId ? data.event : e));
+                            r.events = r.events.map((e) =>
+                                e.id === optimisticId ? data.event : e,
+                            );
                         }
                     });
                     return { ...prev, runs };
@@ -241,7 +282,10 @@ export default function WorkspaceIndex({
     const handleApproveTool = async (approvalId: string) => {
         const res = await fetch(`/api/approvals/${approvalId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
             body: JSON.stringify({ status: 'approved' }),
         });
 
@@ -253,8 +297,14 @@ export default function WorkspaceIndex({
     const handleRejectTool = async (approvalId: string, reason: string) => {
         const res = await fetch(`/api/approvals/${approvalId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ status: 'rejected', decision_reason: reason }),
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'rejected',
+                decision_reason: reason,
+            }),
         });
 
         if (res.ok) {
@@ -265,7 +315,10 @@ export default function WorkspaceIndex({
     const handleMergeTask = async (taskId: string) => {
         const res = await fetch(`/api/tasks/${taskId}/merge`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
         });
 
         const data = await res.json();
@@ -276,7 +329,10 @@ export default function WorkspaceIndex({
         }
     };
 
-    const totalProjectSpent = tasks.reduce((acc, t) => acc + Number(t.total_cost_usd || 0), 0);
+    const totalProjectSpent = tasks.reduce(
+        (acc, t) => acc + Number(t.total_cost_usd || 0),
+        0,
+    );
 
     return (
         <>
@@ -284,14 +340,16 @@ export default function WorkspaceIndex({
 
             <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
                 {/* Global Application Header */}
-                <header className="flex h-14 items-center justify-between border-b border-border px-6 bg-card">
+                <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
                     {/* Brand & Project Info */}
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground shadow-sm">
                                 <Sparkles className="h-4 w-4" />
                             </div>
-                            <span className="font-bold text-sm tracking-tight text-foreground">Antigravity Orchestrator</span>
+                            <span className="text-sm font-bold tracking-tight text-foreground">
+                                Antigravity Orchestrator
+                            </span>
                         </div>
 
                         <div className="h-4 w-px bg-border" />
@@ -301,11 +359,16 @@ export default function WorkspaceIndex({
                                 setSettingsTab('workspace');
                                 setIsSettingsOpen(true);
                             }}
-                            className="flex items-center gap-2 text-xs cursor-pointer rounded-lg hover:bg-muted/60 px-2 py-1 transition-colors border border-transparent hover:border-border/60"
+                            className="flex cursor-pointer items-center gap-2 rounded-lg border border-transparent px-2 py-1 text-xs transition-colors hover:border-border/60 hover:bg-muted/60"
                             title="Clique para alterar ou navegar diretórios do workspace"
                         >
-                            <span className="font-semibold text-foreground">{currentProject.name}</span>
-                            <Badge variant="outline" className="font-mono text-[10px] text-muted-foreground gap-1 hover:border-primary/50 transition-colors">
+                            <span className="font-semibold text-foreground">
+                                {currentProject.name}
+                            </span>
+                            <Badge
+                                variant="outline"
+                                className="gap-1 font-mono text-[10px] text-muted-foreground transition-colors hover:border-primary/50"
+                            >
                                 <FolderGit2 className="h-3 w-3 text-indigo-500" />
                                 {currentProject.workspace_path}
                             </Badge>
@@ -313,7 +376,7 @@ export default function WorkspaceIndex({
                     </div>
 
                     {/* View Navigation Tabs */}
-                    <div className="flex items-center rounded-lg bg-muted/60 p-1 border border-border/60">
+                    <div className="flex items-center rounded-lg border border-border/60 bg-muted/60 p-1">
                         <button
                             type="button"
                             onClick={() => setActiveTab('board')}
@@ -357,18 +420,26 @@ export default function WorkspaceIndex({
                     {/* Cost & Budget Telemetry */}
                     <div className="flex items-center gap-3 text-xs">
                         {activeAgentIds.length > 0 && (
-                            <Badge variant="outline" className="border-amber-500 bg-amber-500/10 text-amber-600 gap-1 animate-pulse">
+                            <Badge
+                                variant="outline"
+                                className="animate-pulse gap-1 border-amber-500 bg-amber-500/10 text-amber-600"
+                            >
                                 <Activity className="h-3 w-3" />
                                 {activeAgentIds.length} Agents Active
                             </Badge>
                         )}
 
-                        <div className="flex items-center gap-1.5 font-mono text-muted-foreground bg-muted/40 rounded-lg px-2.5 py-1">
+                        <div className="flex items-center gap-1.5 rounded-lg bg-muted/40 px-2.5 py-1 font-mono text-muted-foreground">
                             <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
-                            <span className="font-semibold text-foreground">${totalProjectSpent.toFixed(4)}</span>
+                            <span className="font-semibold text-foreground">
+                                ${totalProjectSpent.toFixed(4)}
+                            </span>
                             {project.monthly_budget_usd && (
                                 <span className="text-[10px] text-muted-foreground">
-                                    / ${Number(project.monthly_budget_usd).toFixed(0)}
+                                    / $
+                                    {Number(project.monthly_budget_usd).toFixed(
+                                        0,
+                                    )}
                                 </span>
                             )}
                         </div>
@@ -389,7 +460,7 @@ export default function WorkspaceIndex({
                 </header>
 
                 {/* Main Workspace Area with Sliding Inspector Console */}
-                <div className="flex flex-1 overflow-hidden relative">
+                <div className="relative flex flex-1 overflow-hidden">
                     {/* Active View */}
                     <main className="flex-1 overflow-hidden">
                         {activeTab === 'canvas' && (
@@ -415,12 +486,16 @@ export default function WorkspaceIndex({
                         )}
 
                         {activeTab === 'mcp' && (
-                            <div className="p-8 max-w-4xl mx-auto space-y-6">
+                            <div className="mx-auto max-w-4xl space-y-6 p-8">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h2 className="text-xl font-bold">Dynamic MCP Catalog & Telemetry</h2>
+                                        <h2 className="text-xl font-bold">
+                                            Dynamic MCP Catalog & Telemetry
+                                        </h2>
                                         <p className="text-sm text-muted-foreground">
-                                            Gerencie servidores Model Context Protocol conectados e ferramentas dinâmicas de IA.
+                                            Gerencie servidores Model Context
+                                            Protocol conectados e ferramentas
+                                            dinâmicas de IA.
                                         </p>
                                     </div>
                                     <Button
@@ -434,46 +509,76 @@ export default function WorkspaceIndex({
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="rounded-xl border border-border p-4 bg-card space-y-2">
-                                        <h4 className="text-sm font-semibold">Native PHP Tools Discovered</h4>
+                                    <div className="space-y-2 rounded-xl border border-border bg-card p-4">
+                                        <h4 className="text-sm font-semibold">
+                                            Native PHP Tools Discovered
+                                        </h4>
                                         <p className="text-xs text-muted-foreground">
-                                            {availableTools.length} tool classes discovered in <code>app/Ai/Tools/*</code>
+                                            {availableTools.length} tool classes
+                                            discovered in{' '}
+                                            <code>app/Ai/Tools/*</code>
                                         </p>
                                         <div className="flex flex-wrap gap-1.5 pt-2">
                                             {availableTools.map((t) => (
-                                                <Badge key={t.class} variant="secondary" className="text-[11px]">
+                                                <Badge
+                                                    key={t.class}
+                                                    variant="secondary"
+                                                    className="text-[11px]"
+                                                >
                                                     {t.name}
                                                 </Badge>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div className="rounded-xl border border-border p-4 bg-card space-y-2">
+                                    <div className="space-y-2 rounded-xl border border-border bg-card p-4">
                                         <div className="flex items-center justify-between">
-                                            <h4 className="text-sm font-semibold">Active MCP Servers</h4>
-                                            <Badge variant="secondary" className="text-xs">
+                                            <h4 className="text-sm font-semibold">
+                                                Active MCP Servers
+                                            </h4>
+                                            <Badge
+                                                variant="secondary"
+                                                className="text-xs"
+                                            >
                                                 {mcpServers.length} Conectados
                                             </Badge>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            Servidores externos fornecendo ferramentas para os agentes.
+                                            Servidores externos fornecendo
+                                            ferramentas para os agentes.
                                         </p>
                                         <div className="space-y-2 pt-2">
                                             {mcpServers.length === 0 ? (
                                                 <p className="text-xs text-muted-foreground italic">
-                                                    Nenhum servidor MCP externo cadastrado ainda.
+                                                    Nenhum servidor MCP externo
+                                                    cadastrado ainda.
                                                 </p>
                                             ) : (
                                                 mcpServers.map((s) => (
-                                                    <div key={s.id} className="flex items-center justify-between p-2 rounded-lg border border-border/60 bg-muted/30">
+                                                    <div
+                                                        key={s.id}
+                                                        className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 p-2"
+                                                    >
                                                         <div>
-                                                            <div className="text-xs font-semibold">{s.name}</div>
-                                                            <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[220px]">
-                                                                {s.transport} • {s.command_or_url}
+                                                            <div className="text-xs font-semibold">
+                                                                {s.name}
+                                                            </div>
+                                                            <div className="max-w-[220px] truncate font-mono text-[10px] text-muted-foreground">
+                                                                {s.transport} •{' '}
+                                                                {
+                                                                    s.command_or_url
+                                                                }
                                                             </div>
                                                         </div>
-                                                        <Badge variant="outline" className="text-[10px]">
-                                                            {s.discovered_tools_cache?.length || 0} tools
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-[10px]"
+                                                        >
+                                                            {s
+                                                                .discovered_tools_cache
+                                                                ?.length ||
+                                                                0}{' '}
+                                                            tools
                                                         </Badge>
                                                     </div>
                                                 ))

@@ -59,7 +59,9 @@ export function TaskInspector({
     });
 
     sortedRuns.forEach((run) => {
-        const sortedRunEvents = [...(run.events || [])].sort((a, b) => a.sequence - b.sequence);
+        const sortedRunEvents = [...(run.events || [])].sort(
+            (a, b) => a.sequence - b.sequence,
+        );
 
         // Consolidate streaming message_delta events into the latest text within this run
         const consolidatedEvents: AgentRunEvent[] = [];
@@ -130,7 +132,10 @@ export function TaskInspector({
         try {
             const res = await fetch(`/api/tasks/${task.id}/retry`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
             });
             if (res.ok) {
                 toast.success('Tarefa reiniciada com sucesso!');
@@ -145,25 +150,35 @@ export function TaskInspector({
     };
 
     return (
-        <aside className="flex flex-col w-[480px] xl:w-[540px] h-full border-l border-border bg-card shadow-2xl z-20">
+        <aside className="z-20 flex h-full w-[480px] flex-col border-l border-border bg-card shadow-2xl xl:w-[540px]">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-border/80 p-4 bg-muted/20">
-                <div className="space-y-1.5 flex-1 pr-3">
+            <div className="flex items-start justify-between border-b border-border/80 bg-muted/20 p-4">
+                <div className="flex-1 space-y-1.5 pr-3">
                     <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs uppercase font-semibold">
+                        <Badge
+                            variant="outline"
+                            className="text-xs font-semibold uppercase"
+                        >
                             {task.status.replace('_', ' ')}
                         </Badge>
                         {task.assigned_agent && (
-                            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                            <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
                                 <Bot className="h-3.5 w-3.5 text-primary" />
                                 {task.assigned_agent.name}
                             </span>
                         )}
                     </div>
-                    <h3 className="text-base font-bold leading-tight text-foreground">{task.title}</h3>
+                    <h3 className="text-base leading-tight font-bold text-foreground">
+                        {task.title}
+                    </h3>
                 </div>
 
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={onClose}
+                >
                     <X className="h-4 w-4" />
                 </Button>
             </div>
@@ -173,52 +188,71 @@ export function TaskInspector({
                 <div className="flex items-center justify-between gap-2 border-b border-destructive/20 bg-destructive/10 px-4 py-2 text-xs text-destructive">
                     <div className="flex items-center gap-1.5 font-medium">
                         <AlertCircle className="h-4 w-4 shrink-0" />
-                        <span>A execução foi interrompida (ex: taxa da IA).</span>
+                        <span>
+                            A execução foi interrompida (ex: taxa da IA).
+                        </span>
                     </div>
                     <Button
                         size="sm"
                         onClick={handleRetry}
                         disabled={retrying}
-                        className="h-7 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-1 px-2.5 font-medium shadow-sm shrink-0"
+                        className="h-7 shrink-0 gap-1 bg-destructive px-2.5 text-xs font-medium text-destructive-foreground shadow-sm hover:bg-destructive/90"
                     >
-                        <RotateCcw className={`h-3 w-3 ${retrying ? 'animate-spin' : ''}`} />
+                        <RotateCcw
+                            className={`h-3 w-3 ${retrying ? 'animate-spin' : ''}`}
+                        />
                         {retrying ? 'Re-tentando...' : 'Re-tentar'}
                     </Button>
                 </div>
             )}
 
             {/* Live Metrics Bar (Paperclip Style) */}
-            <div className="grid grid-cols-3 border-b border-border/60 bg-muted/10 py-2 px-4 text-xs font-mono text-muted-foreground">
+            <div className="grid grid-cols-3 border-b border-border/60 bg-muted/10 px-4 py-2 font-mono text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                     <Cpu className="h-3.5 w-3.5 text-indigo-500" />
-                    <span>{(task.total_tokens || 0).toLocaleString()} tokens</span>
+                    <span>
+                        {(task.total_tokens || 0).toLocaleString()} tokens
+                    </span>
                 </div>
-                <div className="flex items-center gap-1 justify-center">
+                <div className="flex items-center justify-center gap-1">
                     <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                         ${Number(task.total_cost_usd || 0).toFixed(4)}
                     </span>
                 </div>
                 <div className="text-right">
-                    <span>Limit: ${Number(task.budget_limit_usd || 5.0).toFixed(2)}</span>
+                    <span>
+                        Limit: $
+                        {Number(task.budget_limit_usd || 5.0).toFixed(2)}
+                    </span>
                 </div>
             </div>
 
             {/* Delegated Subtasks Tree */}
             {(task.subtasks || []).length > 0 && (
                 <div className="border-b border-border/60 bg-indigo-500/5 p-3 text-xs">
-                    <div className="flex items-center gap-1.5 font-semibold text-indigo-700 dark:text-indigo-300 mb-2">
+                    <div className="mb-2 flex items-center gap-1.5 font-semibold text-indigo-700 dark:text-indigo-300">
                         <ListTree className="h-3.5 w-3.5" />
-                        <span>Autonomous Subtasks ({task.subtasks!.length})</span>
+                        <span>
+                            Autonomous Subtasks ({task.subtasks!.length})
+                        </span>
                     </div>
                     <div className="space-y-1.5 pl-2">
                         {task.subtasks!.map((sub) => (
-                            <div key={sub.id} className="flex items-center justify-between py-0.5 border-l-2 border-indigo-400 pl-2">
-                                <div className="flex items-center gap-1.5 truncate max-w-[280px]">
+                            <div
+                                key={sub.id}
+                                className="flex items-center justify-between border-l-2 border-indigo-400 py-0.5 pl-2"
+                            >
+                                <div className="flex max-w-[280px] items-center gap-1.5 truncate">
                                     <CornerDownRight className="h-3 w-3 text-muted-foreground" />
-                                    <span className="font-medium text-foreground">{sub.title}</span>
+                                    <span className="font-medium text-foreground">
+                                        {sub.title}
+                                    </span>
                                 </div>
-                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                <Badge
+                                    variant="outline"
+                                    className="px-1.5 py-0 text-[10px]"
+                                >
                                     {sub.status}
                                 </Badge>
                             </div>
@@ -240,10 +274,10 @@ export function TaskInspector({
             )}
 
             {/* Conversational Timeline (Antigravity AI Elements) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 space-y-3 overflow-y-auto p-4">
                 {/* Initial Task Objective */}
-                <div className="rounded-xl border border-border/80 bg-muted/40 p-3.5 text-xs text-foreground space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">
+                <div className="space-y-1 rounded-xl border border-border/80 bg-muted/40 p-3.5 text-xs text-foreground">
+                    <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                         <User className="h-3 w-3" /> Initial Prompt / Goal
                     </div>
                     <p className="whitespace-pre-wrap">{task.description}</p>
@@ -255,7 +289,9 @@ export function TaskInspector({
                         return (
                             <ReasoningBlock
                                 key={ev.id}
-                                reasoning={ev.payload.reasoning || ev.payload.delta}
+                                reasoning={
+                                    ev.payload.reasoning || ev.payload.delta
+                                }
                                 isStreaming={task.status === 'running'}
                             />
                         );
@@ -263,12 +299,16 @@ export function TaskInspector({
 
                     if (ev.event_type === 'tool_call') {
                         const matchedApproval = approvals.find(
-                            (a) => a.tool_call_id === ev.payload.call_id || a.tool_name === ev.payload.name
+                            (a) =>
+                                a.tool_call_id === ev.payload.call_id ||
+                                a.tool_name === ev.payload.name,
                         );
 
                         // Find subsequent tool_result if available
                         const resultEvent = uniqueEvents.find(
-                            (e) => e.event_type === 'tool_result' && e.payload.call_id === ev.payload.call_id
+                            (e) =>
+                                e.event_type === 'tool_result' &&
+                                e.payload.call_id === ev.payload.call_id,
                         );
 
                         return (
@@ -287,10 +327,15 @@ export function TaskInspector({
 
                     if (ev.event_type === 'message_delta') {
                         return (
-                            <div key={ev.id} className="rounded-xl border border-border/80 bg-card p-3.5 text-xs leading-relaxed text-foreground shadow-sm">
-                                <div className="flex items-center gap-1.5 font-semibold text-primary mb-2 text-[11px]">
+                            <div
+                                key={ev.id}
+                                className="rounded-xl border border-border/80 bg-card p-3.5 text-xs leading-relaxed text-foreground shadow-sm"
+                            >
+                                <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-primary">
                                     <Bot className="h-3.5 w-3.5" />
-                                    <span>{task.assigned_agent?.name || 'Agent'}</span>
+                                    <span>
+                                        {task.assigned_agent?.name || 'Agent'}
+                                    </span>
                                 </div>
                                 <div className="prose dark:prose-invert max-w-none text-xs">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -303,12 +348,15 @@ export function TaskInspector({
 
                     if (ev.event_type === 'user_message') {
                         return (
-                            <div key={ev.id} className="flex flex-col items-end gap-1">
-                                <div className="flex items-center gap-1 text-[10px] text-muted-foreground mr-1">
+                            <div
+                                key={ev.id}
+                                className="flex flex-col items-end gap-1"
+                            >
+                                <div className="mr-1 flex items-center gap-1 text-[10px] text-muted-foreground">
                                     <User className="h-3 w-3" />
                                     <span>You</span>
                                 </div>
-                                <div className="rounded-xl bg-primary text-primary-foreground p-3 text-xs max-w-[85%] whitespace-pre-wrap shadow-sm">
+                                <div className="max-w-[85%] rounded-xl bg-primary p-3 text-xs whitespace-pre-wrap text-primary-foreground shadow-sm">
                                     {ev.payload.text}
                                 </div>
                             </div>
@@ -317,7 +365,10 @@ export function TaskInspector({
 
                     if (ev.event_type === 'error') {
                         return (
-                            <div key={ev.id} className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                            <div
+                                key={ev.id}
+                                className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive"
+                            >
                                 {ev.payload.message}
                             </div>
                         );
@@ -330,14 +381,22 @@ export function TaskInspector({
             </div>
 
             {/* Human Input Prompt Bar */}
-            <form onSubmit={handleSend} className="p-3 border-t border-border bg-card flex items-center gap-2">
+            <form
+                onSubmit={handleSend}
+                className="flex items-center gap-2 border-t border-border bg-card p-3"
+            >
                 <Input
                     placeholder="Provide additional instructions or answer agent questions..."
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    className="flex-1 h-10 text-xs"
+                    className="h-10 flex-1 text-xs"
                 />
-                <Button type="submit" size="sm" className="h-10 px-3.5" disabled={sending || !inputMessage.trim()}>
+                <Button
+                    type="submit"
+                    size="sm"
+                    className="h-10 px-3.5"
+                    disabled={sending || !inputMessage.trim()}
+                >
                     <Send className="h-4 w-4" />
                 </Button>
             </form>

@@ -27,7 +27,11 @@ export interface McpServer {
     transport: 'stdio' | 'sse' | 'streamable_http';
     command_or_url: string;
     args_and_env: Record<string, any> | null;
-    discovered_tools_cache: Array<{ name: string; description: string; inputSchema: any }> | null;
+    discovered_tools_cache: Array<{
+        name: string;
+        description: string;
+        inputSchema: any;
+    }> | null;
     is_active: boolean;
 }
 

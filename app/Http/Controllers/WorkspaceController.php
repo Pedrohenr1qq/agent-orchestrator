@@ -517,7 +517,11 @@ class WorkspaceController extends Controller
 
     public function listWorkspaceDirectories(): JsonResponse
     {
+        $workspaceService = app(WorkspaceManagerService::class);
+        $workspacesRoot = $workspaceService->getWorkspacesRoot();
+
         $locations = [
+            ['root' => $workspacesRoot, 'label' => "Workspaces ({$workspacesRoot})"],
             ['root' => '/workspaces', 'label' => 'Desenvolvimento (/home/pedro/dev)'],
             ['root' => '/host_home/Documents', 'label' => 'Documentos (/home/pedro/Documents)'],
             ['root' => '/host_home/Desktop', 'label' => 'Área de Trabalho (/home/pedro/Desktop)'],

@@ -22,10 +22,15 @@ export function getEchoInstance(config?: {
         window.Echo = new Echo({
             broadcaster: 'reverb',
             key: config?.key || import.meta.env.VITE_REVERB_APP_KEY,
-            wsHost: config?.host || import.meta.env.VITE_REVERB_HOST || window.location.hostname,
+            wsHost:
+                config?.host ||
+                import.meta.env.VITE_REVERB_HOST ||
+                window.location.hostname,
             wsPort: config?.port || import.meta.env.VITE_REVERB_PORT || 8080,
             wssPort: config?.port || import.meta.env.VITE_REVERB_PORT || 8080,
-            forceTLS: (config?.scheme || import.meta.env.VITE_REVERB_SCHEME) === 'https',
+            forceTLS:
+                (config?.scheme || import.meta.env.VITE_REVERB_SCHEME) ===
+                'https',
             enabledTransports: ['ws', 'wss'],
         });
     }

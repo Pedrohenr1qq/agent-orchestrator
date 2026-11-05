@@ -16,7 +16,13 @@ import '@xyflow/react/dist/style.css';
 
 import { AgentNodeCard, AgentCustomNode } from './AgentNodeCard';
 import { AgentNodeConfigDrawer } from './AgentNodeConfigDrawer';
-import { AgentNode, Blueprint, DiscoveredTool, McpServer, Workflow } from '@/types/orchestrator';
+import {
+    AgentNode,
+    Blueprint,
+    DiscoveredTool,
+    McpServer,
+    Workflow,
+} from '@/types/orchestrator';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -52,7 +58,10 @@ interface Props {
     availableTools: DiscoveredTool[];
     mcpServers: McpServer[];
     activeAgentIds?: string[];
-    onSaveWorkflow: (nodes: AgentNode[], edges: { source: string; target: string; label?: string }[]) => Promise<void>;
+    onSaveWorkflow: (
+        nodes: AgentNode[],
+        edges: { source: string; target: string; label?: string }[],
+    ) => Promise<void>;
 }
 
 export function WorkflowCanvas({
@@ -74,7 +83,8 @@ export function WorkflowCanvas({
             data: {
                 node,
                 isRunning: activeAgentIds.includes(node.id),
-                onConfigure: (selectedNode: AgentNode) => setSelectedNode(selectedNode),
+                onConfigure: (selectedNode: AgentNode) =>
+                    setSelectedNode(selectedNode),
             },
         }));
     }, [workflow.agent_nodes, activeAgentIds]);
@@ -102,8 +112,14 @@ export function WorkflowCanvas({
     }, [workflow.id, workflow.updated_at]);
 
     const onConnect = useCallback(
-        (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, label: 'Delegates to' }, eds)),
-        [setEdges]
+        (params: Connection) =>
+            setEdges((eds) =>
+                addEdge(
+                    { ...params, animated: true, label: 'Delegates to' },
+                    eds,
+                ),
+            ),
+        [setEdges],
     );
 
     const handleAddNodeFromBlueprint = (blueprint: Blueprint) => {
@@ -120,7 +136,7 @@ export function WorkflowCanvas({
             instructions: '',
             enabled_tools: blueprint.default_tools,
             tools_requiring_approval: [],
-            max_task_budget_usd: 2.00,
+            max_task_budget_usd: 2.0,
             max_tokens_per_run: 100000,
             position_xy: { x: 250, y: 200 },
         };
@@ -128,7 +144,10 @@ export function WorkflowCanvas({
         const flowNode: Node = {
             id: newNodeId,
             type: 'agentNode',
-            position: { x: 250 + nodes.length * 30, y: 200 + nodes.length * 20 },
+            position: {
+                x: 250 + nodes.length * 30,
+                y: 200 + nodes.length * 20,
+            },
             data: {
                 node: newNode,
                 isRunning: false,
@@ -149,9 +168,15 @@ export function WorkflowCanvas({
         }
 
         if (type === 'content') {
-            const resBp = blueprints.find((b) => b.class.includes('ResearcherAgent')) || blueprints[0];
-            const wrtBp = blueprints.find((b) => b.class.includes('WriterAgent')) || blueprints[0];
-            const edtBp = blueprints.find((b) => b.class.includes('EditorAgent')) || blueprints[0];
+            const resBp =
+                blueprints.find((b) => b.class.includes('ResearcherAgent')) ||
+                blueprints[0];
+            const wrtBp =
+                blueprints.find((b) => b.class.includes('WriterAgent')) ||
+                blueprints[0];
+            const edtBp =
+                blueprints.find((b) => b.class.includes('EditorAgent')) ||
+                blueprints[0];
 
             const id1 = crypto.randomUUID();
             const id2 = crypto.randomUUID();
@@ -166,10 +191,11 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Pesquise fontes e referências online antes de delegar a escrita.',
+                instructions:
+                    'Pesquise fontes e referências online antes de delegar a escrita.',
                 enabled_tools: resBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 2.00,
+                max_task_budget_usd: 2.0,
                 position_xy: { x: 100, y: 150 },
             };
 
@@ -182,10 +208,11 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Redija o documento completo em Markdown estruturado.',
+                instructions:
+                    'Redija o documento completo em Markdown estruturado.',
                 enabled_tools: wrtBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 2.50,
+                max_task_budget_usd: 2.5,
                 position_xy: { x: 370, y: 430 },
             };
 
@@ -198,34 +225,70 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Revise gramática, fluidez e qualidade antes da aprovação final.',
+                instructions:
+                    'Revise gramática, fluidez e qualidade antes da aprovação final.',
                 enabled_tools: edtBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 1.50,
+                max_task_budget_usd: 1.5,
                 position_xy: { x: -160, y: 430 },
             };
 
             const newNodes: Node[] = [
-                { id: id1, type: 'agentNode', position: { x: 100, y: 150 }, data: { node: node1, onConfigure: setSelectedNode } },
-                { id: id2, type: 'agentNode', position: { x: 370, y: 430 }, data: { node: node2, onConfigure: setSelectedNode } },
-                { id: id3, type: 'agentNode', position: { x: -160, y: 430 }, data: { node: node3, onConfigure: setSelectedNode } },
+                {
+                    id: id1,
+                    type: 'agentNode',
+                    position: { x: 100, y: 150 },
+                    data: { node: node1, onConfigure: setSelectedNode },
+                },
+                {
+                    id: id2,
+                    type: 'agentNode',
+                    position: { x: 370, y: 430 },
+                    data: { node: node2, onConfigure: setSelectedNode },
+                },
+                {
+                    id: id3,
+                    type: 'agentNode',
+                    position: { x: -160, y: 430 },
+                    data: { node: node3, onConfigure: setSelectedNode },
+                },
             ];
 
             const newEdges: Edge[] = [
-                { id: `e-${id1}-${id2}`, source: id1, target: id2, label: 'Delega Redação', animated: true },
-                { id: `e-${id1}-${id3}`, source: id1, target: id3, label: 'Delega Revisão', animated: true },
+                {
+                    id: `e-${id1}-${id2}`,
+                    source: id1,
+                    target: id2,
+                    label: 'Delega Redação',
+                    animated: true,
+                },
+                {
+                    id: `e-${id1}-${id3}`,
+                    source: id1,
+                    target: id3,
+                    label: 'Delega Revisão',
+                    animated: true,
+                },
             ];
 
             setNodes(newNodes);
             setEdges(newEdges);
-            toast.success('Template de Conteúdo & Pesquisa aplicado! Clique em "Salvar Workflow" para confirmar.');
+            toast.success(
+                'Template de Conteúdo & Pesquisa aplicado! Clique em "Salvar Workflow" para confirmar.',
+            );
             return;
         }
 
         if (type === 'code') {
-            const planBp = blueprints.find((b) => b.class.includes('PlannerAgent')) || blueprints[0];
-            const codeBp = blueprints.find((b) => b.class.includes('CodingAgent')) || blueprints[0];
-            const revBp = blueprints.find((b) => b.class.includes('ReviewerAgent')) || blueprints[0];
+            const planBp =
+                blueprints.find((b) => b.class.includes('PlannerAgent')) ||
+                blueprints[0];
+            const codeBp =
+                blueprints.find((b) => b.class.includes('CodingAgent')) ||
+                blueprints[0];
+            const revBp =
+                blueprints.find((b) => b.class.includes('ReviewerAgent')) ||
+                blueprints[0];
 
             const id1 = crypto.randomUUID();
             const id2 = crypto.randomUUID();
@@ -240,10 +303,11 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Planeje e decomponha tarefas de software em subtarefas.',
+                instructions:
+                    'Planeje e decomponha tarefas de software em subtarefas.',
                 enabled_tools: planBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 2.00,
+                max_task_budget_usd: 2.0,
                 position_xy: { x: 100, y: 150 },
             };
 
@@ -256,10 +320,11 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Implemente os requisitos com código limpo e padrões do projeto.',
+                instructions:
+                    'Implemente os requisitos com código limpo e padrões do projeto.',
                 enabled_tools: codeBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 3.00,
+                max_task_budget_usd: 3.0,
                 position_xy: { x: 370, y: 430 },
             };
 
@@ -272,27 +337,57 @@ export function WorkflowCanvas({
                 provider: 'gemini',
                 model_name: 'gemini-3.5-flash-lite',
                 reasoning_effort: 'medium',
-                instructions: 'Revise o diff de código e execute validações antes do merge.',
+                instructions:
+                    'Revise o diff de código e execute validações antes do merge.',
                 enabled_tools: revBp.default_tools,
                 tools_requiring_approval: [],
-                max_task_budget_usd: 1.50,
+                max_task_budget_usd: 1.5,
                 position_xy: { x: -160, y: 430 },
             };
 
             const newNodes: Node[] = [
-                { id: id1, type: 'agentNode', position: { x: 100, y: 150 }, data: { node: node1, onConfigure: setSelectedNode } },
-                { id: id2, type: 'agentNode', position: { x: 370, y: 430 }, data: { node: node2, onConfigure: setSelectedNode } },
-                { id: id3, type: 'agentNode', position: { x: -160, y: 430 }, data: { node: node3, onConfigure: setSelectedNode } },
+                {
+                    id: id1,
+                    type: 'agentNode',
+                    position: { x: 100, y: 150 },
+                    data: { node: node1, onConfigure: setSelectedNode },
+                },
+                {
+                    id: id2,
+                    type: 'agentNode',
+                    position: { x: 370, y: 430 },
+                    data: { node: node2, onConfigure: setSelectedNode },
+                },
+                {
+                    id: id3,
+                    type: 'agentNode',
+                    position: { x: -160, y: 430 },
+                    data: { node: node3, onConfigure: setSelectedNode },
+                },
             ];
 
             const newEdges: Edge[] = [
-                { id: `e-${id1}-${id2}`, source: id1, target: id2, label: 'Delega Implementação', animated: true },
-                { id: `e-${id1}-${id3}`, source: id1, target: id3, label: 'Delega Verificação', animated: true },
+                {
+                    id: `e-${id1}-${id2}`,
+                    source: id1,
+                    target: id2,
+                    label: 'Delega Implementação',
+                    animated: true,
+                },
+                {
+                    id: `e-${id1}-${id3}`,
+                    source: id1,
+                    target: id3,
+                    label: 'Delega Verificação',
+                    animated: true,
+                },
             ];
 
             setNodes(newNodes);
             setEdges(newEdges);
-            toast.success('Template de Engenharia de Software aplicado! Clique em "Salvar Workflow" para confirmar.');
+            toast.success(
+                'Template de Engenharia de Software aplicado! Clique em "Salvar Workflow" para confirmar.',
+            );
         }
     };
 
@@ -309,7 +404,7 @@ export function WorkflowCanvas({
                     };
                 }
                 return n;
-            })
+            }),
         );
         setSelectedNode(null);
         toast.success('Agent node updated');
@@ -317,7 +412,9 @@ export function WorkflowCanvas({
 
     const handleDeleteNode = (nodeId: string) => {
         setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-        setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
+        setEdges((eds) =>
+            eds.filter((e) => e.source !== nodeId && e.target !== nodeId),
+        );
         setSelectedNode(null);
         toast.info('Agent node deleted');
     };
@@ -347,13 +444,47 @@ export function WorkflowCanvas({
 
     const getBlueprintIcon = (roleTitle?: string, iconName?: string) => {
         const text = ((roleTitle || '') + ' ' + (iconName || '')).toLowerCase();
-        if (text.includes('cad') || text.includes('solidcraft') || text.includes('box') || text.includes('3d') || text.includes('mechanical')) return Box;
+        if (
+            text.includes('cad') ||
+            text.includes('solidcraft') ||
+            text.includes('box') ||
+            text.includes('3d') ||
+            text.includes('mechanical')
+        )
+            return Box;
         if (text.includes('research') || text.includes('globe')) return Globe;
-        if (text.includes('writer') || text.includes('drafter') || text.includes('pen')) return PenTool;
-        if (text.includes('editor') || (text.includes('reviewer') && !text.includes('code') && !text.includes('qa')) || text.includes('book')) return BookOpen;
-        if (text.includes('lead') || text.includes('planner') || text.includes('brain')) return Brain;
-        if (text.includes('engineer') || text.includes('developer') || text.includes('code')) return Code2;
-        if (text.includes('security') || text.includes('qa') || text.includes('shield')) return ShieldCheck;
+        if (
+            text.includes('writer') ||
+            text.includes('drafter') ||
+            text.includes('pen')
+        )
+            return PenTool;
+        if (
+            text.includes('editor') ||
+            (text.includes('reviewer') &&
+                !text.includes('code') &&
+                !text.includes('qa')) ||
+            text.includes('book')
+        )
+            return BookOpen;
+        if (
+            text.includes('lead') ||
+            text.includes('planner') ||
+            text.includes('brain')
+        )
+            return Brain;
+        if (
+            text.includes('engineer') ||
+            text.includes('developer') ||
+            text.includes('code')
+        )
+            return Code2;
+        if (
+            text.includes('security') ||
+            text.includes('qa') ||
+            text.includes('shield')
+        )
+            return ShieldCheck;
         return Sparkles;
     };
 
@@ -364,14 +495,18 @@ export function WorkflowCanvas({
                 {/* Templates Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 text-xs font-medium"
+                        >
                             <LayoutTemplate className="h-3.5 w-3.5 text-primary" />
                             <span>Templates</span>
                             <ChevronDown className="h-3 w-3 opacity-60" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-64">
-                        <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        <DropdownMenuLabel className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                             Modelos de Workflow
                         </DropdownMenuLabel>
                         <DropdownMenuItem
@@ -380,8 +515,12 @@ export function WorkflowCanvas({
                         >
                             <Code2 className="h-4 w-4 text-sky-400" />
                             <div className="flex flex-col">
-                                <span className="font-medium text-xs">Engenharia de Software</span>
-                                <span className="text-[10px] text-muted-foreground">Tech Lead + Dev + QA</span>
+                                <span className="text-xs font-medium">
+                                    Engenharia de Software
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">
+                                    Tech Lead + Dev + QA
+                                </span>
                             </div>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -390,8 +529,12 @@ export function WorkflowCanvas({
                         >
                             <FileText className="h-4 w-4 text-emerald-400" />
                             <div className="flex flex-col">
-                                <span className="font-medium text-xs">Pesquisa & Redação</span>
-                                <span className="text-[10px] text-muted-foreground">Pesquisador + Redator + Revisor</span>
+                                <span className="text-xs font-medium">
+                                    Pesquisa & Redação
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">
+                                    Pesquisador + Redator + Revisor
+                                </span>
                             </div>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -400,7 +543,9 @@ export function WorkflowCanvas({
                             onClick={() => handleApplyTemplate('blank')}
                         >
                             <Trash2 className="h-3.5 w-3.5" />
-                            <span className="text-xs">Limpar Canvas (Em Branco)</span>
+                            <span className="text-xs">
+                                Limpar Canvas (Em Branco)
+                            </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -408,14 +553,18 @@ export function WorkflowCanvas({
                 {/* Add Agent Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" size="sm" className="h-8 gap-1.5 text-xs font-medium">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="h-8 gap-1.5 text-xs font-medium"
+                        >
                             <Plus className="h-3.5 w-3.5 text-primary" />
                             <span>Adicionar Agente</span>
                             <ChevronDown className="h-3 w-3 opacity-60" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-72">
-                        <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        <DropdownMenuLabel className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                             Arquétipos Disponíveis
                         </DropdownMenuLabel>
                         {blueprints.map((bp) => {
@@ -424,14 +573,20 @@ export function WorkflowCanvas({
                                 <DropdownMenuItem
                                     key={bp.class}
                                     className="cursor-pointer gap-2.5 py-2"
-                                    onClick={() => handleAddNodeFromBlueprint(bp)}
+                                    onClick={() =>
+                                        handleAddNodeFromBlueprint(bp)
+                                    }
                                 >
                                     <div className="flex h-7 w-7 items-center justify-center rounded-md bg-secondary text-primary">
                                         <Icon className="h-4 w-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-medium text-xs">{bp.name}</span>
-                                        <span className="text-[10px] text-muted-foreground line-clamp-1">{bp.role || bp.description}</span>
+                                        <span className="text-xs font-medium">
+                                            {bp.name}
+                                        </span>
+                                        <span className="line-clamp-1 text-[10px] text-muted-foreground">
+                                            {bp.role || bp.description}
+                                        </span>
                                     </div>
                                 </DropdownMenuItem>
                             );
@@ -439,7 +594,7 @@ export function WorkflowCanvas({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <div className="h-4 w-px bg-border/60 mx-1" />
+                <div className="mx-1 h-4 w-px bg-border/60" />
 
                 <Button
                     size="sm"
@@ -463,12 +618,16 @@ export function WorkflowCanvas({
                 fitView
                 className="bg-dot-pattern"
             >
-                <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-                <Controls className="!bg-background !border-border !shadow-md !rounded-lg" />
+                <Background
+                    variant={BackgroundVariant.Dots}
+                    gap={16}
+                    size={1}
+                />
+                <Controls className="!rounded-lg !border-border !bg-background !shadow-md" />
                 <MiniMap
                     nodeStrokeColor={() => '#6366f1'}
                     nodeColor={() => '#818cf8'}
-                    className="!bg-background/80 !border-border !rounded-lg !shadow-md"
+                    className="!rounded-lg !border-border !bg-background/80 !shadow-md"
                 />
             </ReactFlow>
 

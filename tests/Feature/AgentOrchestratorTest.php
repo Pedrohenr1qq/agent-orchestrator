@@ -7,6 +7,7 @@ use App\Jobs\ExecuteAgentTaskJob;
 use App\Models\Project;
 use App\Services\WorkspaceManagerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Ai\Tools\Request;
 use Tests\TestCase;
@@ -131,6 +132,10 @@ class AgentOrchestratorTest extends TestCase
 
     public function test_workspace_directories_api_returns_locations(): void
     {
+        $service = app(WorkspaceManagerService::class);
+        $workspacesRoot = $service->getWorkspacesRoot();
+        File::ensureDirectoryExists($workspacesRoot.'/sample-project');
+
         $response = $this->getJson(route('api.workspaces.directories'));
         $response->assertOk();
         $this->assertIsArray($response->json('locations'));
@@ -142,6 +147,7 @@ class AgentOrchestratorTest extends TestCase
         $tool = new ReadDocumentTool;
         $service = app(WorkspaceManagerService::class);
         $workspacesRoot = $service->getWorkspacesRoot();
+        File::ensureDirectoryExists($workspacesRoot);
         $docPath = $workspacesRoot.'/test_doc.md';
         file_put_contents($docPath, "# Guia de Agentes\n\nEste é um parágrafo de teste sobre inteligência artificial.\n");
 

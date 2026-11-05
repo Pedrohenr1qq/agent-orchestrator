@@ -25,11 +25,15 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
     const [name, setName] = useState('SolidCraft Local (Stdio)');
     const [transport, setTransport] = useState<'stdio' | 'sse'>('stdio');
     const [commandOrUrl, setCommandOrUrl] = useState('/bin/solidcraft-cli');
-    const [argsJson, setArgsJson] = useState('["mcp", "--headless", "--allow-any-path"]');
+    const [argsJson, setArgsJson] = useState(
+        '["mcp", "--headless", "--allow-any-path"]',
+    );
     const [isLoading, setIsLoading] = useState(false);
     const [discoveredTools, setDiscoveredTools] = useState<any[] | null>(null);
 
-    const handleApplyPreset = (preset: 'solidcraft-stdio' | 'solidcraft-sse' | 'custom') => {
+    const handleApplyPreset = (
+        preset: 'solidcraft-stdio' | 'solidcraft-sse' | 'custom',
+    ) => {
         setDiscoveredTools(null);
         if (preset === 'solidcraft-stdio') {
             setName('SolidCraft Local (Stdio)');
@@ -60,14 +64,19 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
                 const argsArray = JSON.parse(argsJson);
                 parsedArgs = { args: argsArray };
             } catch (err) {
-                toast.error('JSON de argumentos inválido. Use o formato: ["arg1", "arg2"]');
+                toast.error(
+                    'JSON de argumentos inválido. Use o formato: ["arg1", "arg2"]',
+                );
                 setIsLoading(false);
                 return;
             }
         }
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content') || '';
             const res = await fetch('/api/mcp-servers', {
                 method: 'POST',
                 headers: {
@@ -86,16 +95,22 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.message || 'Falha ao conectar ao servidor MCP');
+                throw new Error(
+                    data.message || 'Falha ao conectar ao servidor MCP',
+                );
             }
 
             const tools = data.tools || [];
             setDiscoveredTools(tools);
 
             if (tools.length > 0) {
-                toast.success(`Servidor "${name}" conectado com sucesso! ${tools.length} ferramentas descobertas.`);
+                toast.success(
+                    `Servidor "${name}" conectado com sucesso! ${tools.length} ferramentas descobertas.`,
+                );
             } else {
-                toast.warning(`Servidor registrado, mas nenhuma ferramenta foi retornada.`);
+                toast.warning(
+                    `Servidor registrado, mas nenhuma ferramenta foi retornada.`,
+                );
             }
 
             if (onServerCreated) {
@@ -103,7 +118,9 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
             }
             router.reload({ only: ['mcpServers'] });
         } catch (error: any) {
-            toast.error(error.message || 'Erro ao comunicar com o servidor MCP');
+            toast.error(
+                error.message || 'Erro ao comunicar com o servidor MCP',
+            );
         } finally {
             setIsLoading(false);
         }
@@ -118,21 +135,26 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
                         Conectar Servidor MCP
                     </DialogTitle>
                     <DialogDescription>
-                        Cadastre e teste ferramentas dinâmicas via Model Context Protocol (Stdio ou SSE).
+                        Cadastre e teste ferramentas dinâmicas via Model Context
+                        Protocol (Stdio ou SSE).
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSaveAndTest} className="space-y-4 py-2">
                     {/* Presets Rápidos */}
                     <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">Modelos Rápidos (Presets):</Label>
+                        <Label className="text-xs text-muted-foreground">
+                            Modelos Rápidos (Presets):
+                        </Label>
                         <div className="flex flex-wrap gap-2">
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-7 text-xs gap-1 font-medium bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                                onClick={() => handleApplyPreset('solidcraft-stdio')}
+                                className="h-7 gap-1 border-emerald-500/30 bg-emerald-500/10 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                                onClick={() =>
+                                    handleApplyPreset('solidcraft-stdio')
+                                }
                             >
                                 <Sparkles className="h-3 w-3 text-emerald-500" />
                                 SolidCraft Local (Stdio - Recomendado)
@@ -141,8 +163,10 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-7 text-xs gap-1"
-                                onClick={() => handleApplyPreset('solidcraft-sse')}
+                                className="h-7 gap-1 text-xs"
+                                onClick={() =>
+                                    handleApplyPreset('solidcraft-sse')
+                                }
                             >
                                 <Server className="h-3 w-3 text-sky-500" />
                                 Supergateway HTTP (:8090)
@@ -163,27 +187,45 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="mcp-transport">Tipo de Transporte</Label>
+                            <Label htmlFor="mcp-transport">
+                                Tipo de Transporte
+                            </Label>
                             <select
                                 id="mcp-transport"
                                 value={transport}
-                                onChange={(e) => setTransport(e.target.value as 'stdio' | 'sse')}
+                                onChange={(e) =>
+                                    setTransport(
+                                        e.target.value as 'stdio' | 'sse',
+                                    )
+                                }
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                             >
-                                <option value="stdio">stdio (Execução Direta CLI)</option>
-                                <option value="sse">sse (HTTP Server-Sent Events)</option>
+                                <option value="stdio">
+                                    stdio (Execução Direta CLI)
+                                </option>
+                                <option value="sse">
+                                    sse (HTTP Server-Sent Events)
+                                </option>
                             </select>
                         </div>
 
                         <div className="space-y-1.5">
                             <Label htmlFor="mcp-cmd">
-                                {transport === 'stdio' ? 'Comando / Binário' : 'URL SSE'}
+                                {transport === 'stdio'
+                                    ? 'Comando / Binário'
+                                    : 'URL SSE'}
                             </Label>
                             <Input
                                 id="mcp-cmd"
                                 value={commandOrUrl}
-                                onChange={(e) => setCommandOrUrl(e.target.value)}
-                                placeholder={transport === 'stdio' ? 'solidcraft-cli' : 'http://127.0.0.1:8090/sse'}
+                                onChange={(e) =>
+                                    setCommandOrUrl(e.target.value)
+                                }
+                                placeholder={
+                                    transport === 'stdio'
+                                        ? 'solidcraft-cli'
+                                        : 'http://127.0.0.1:8090/sse'
+                                }
                                 required
                             />
                         </div>
@@ -191,7 +233,9 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
 
                     {transport === 'stdio' && (
                         <div className="space-y-1.5">
-                            <Label htmlFor="mcp-args">Argumentos do CLI (Array JSON)</Label>
+                            <Label htmlFor="mcp-args">
+                                Argumentos do CLI (Array JSON)
+                            </Label>
                             <Input
                                 id="mcp-args"
                                 value={argsJson}
@@ -200,22 +244,28 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
                                 className="font-mono text-xs"
                             />
                             <p className="text-[11px] text-muted-foreground">
-                                Executará diretamente o comando local com estes argumentos via pipes Stdio.
+                                Executará diretamente o comando local com estes
+                                argumentos via pipes Stdio.
                             </p>
                         </div>
                     )}
 
                     {/* Feedback de Ferramentas Descobertas */}
                     {discoveredTools && discoveredTools.length > 0 && (
-                        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 space-y-2">
+                        <div className="space-y-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
                             <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                                 <CheckCircle2 className="h-4 w-4" />
-                                {discoveredTools.length} Ferramentas Descobertas com Sucesso!
+                                {discoveredTools.length} Ferramentas Descobertas
+                                com Sucesso!
                             </div>
-                            <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                            <div className="flex max-h-24 flex-wrap gap-1 overflow-y-auto">
                                 {discoveredTools.map((t) => (
-                                    <Badge key={t.name} variant="outline" className="text-[10px] bg-background/50">
-                                        <Wrench className="h-2.5 w-2.5 mr-1 opacity-70" />
+                                    <Badge
+                                        key={t.name}
+                                        variant="outline"
+                                        className="bg-background/50 text-[10px]"
+                                    >
+                                        <Wrench className="mr-1 h-2.5 w-2.5 opacity-70" />
                                         {t.name}
                                     </Badge>
                                 ))}
@@ -224,11 +274,22 @@ export function McpServerModal({ open, onClose, onServerCreated }: Props) {
                     )}
 
                     <DialogFooter className="pt-2">
-                        <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                            disabled={isLoading}
+                        >
                             Fechar
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="gap-2">
-                            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="gap-2"
+                        >
+                            {isLoading && (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            )}
                             Salvar e Testar Conexão
                         </Button>
                     </DialogFooter>

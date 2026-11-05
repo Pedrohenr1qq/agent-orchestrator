@@ -1,24 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+    SheetFooter,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AgentNode, Blueprint, DiscoveredTool, McpServer } from '@/types/orchestrator';
+import {
+    AgentNode,
+    Blueprint,
+    DiscoveredTool,
+    McpServer,
+} from '@/types/orchestrator';
 import { Bot, Save, Trash2, ShieldAlert } from 'lucide-react';
 
 const PROVIDER_MODELS: Record<string, { id: string; name: string }[]> = {
     gemini: [
-        { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash-Lite (Fast, Reliable, Recommended)' },
+        {
+            id: 'gemini-3.5-flash-lite',
+            name: 'Gemini 3.5 Flash-Lite (Fast, Reliable, Recommended)',
+        },
         { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash (Multimodal)' },
-        { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash (High Capacity Reasoning)' },
+        {
+            id: 'gemini-3.8-flash',
+            name: 'Gemini 3.8 Flash (High Capacity Reasoning)',
+        },
         { id: 'gemini-flash-latest', name: 'Gemini Flash Latest' },
     ],
     anthropic: [
-        { id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet (Hybrid Reasoning)' },
+        {
+            id: 'claude-3-7-sonnet-20250219',
+            name: 'Claude 3.7 Sonnet (Hybrid Reasoning)',
+        },
         { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
-        { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku (Fast & Lightweight)' },
+        {
+            id: 'claude-3-5-haiku-20241022',
+            name: 'Claude 3.5 Haiku (Fast & Lightweight)',
+        },
     ],
     openai: [
         { id: 'gpt-4o', name: 'GPT-4o (Omni)' },
@@ -85,18 +109,19 @@ export function AgentNodeConfigDrawer({
 
     return (
         <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-            <SheetContent className="w-full sm:max-w-xl flex flex-col p-0 overflow-hidden">
-                <SheetHeader className="p-6 pb-4 border-b border-border/80">
+            <SheetContent className="flex w-full flex-col overflow-hidden p-0 sm:max-w-xl">
+                <SheetHeader className="border-b border-border/80 p-6 pb-4">
                     <SheetTitle className="flex items-center gap-2">
                         <Bot className="h-5 w-5 text-primary" />
                         Configure Agent Node
                     </SheetTitle>
                     <SheetDescription>
-                        Customize persona, AI provider, instructions, tools, and budget governance for this agent.
+                        Customize persona, AI provider, instructions, tools, and
+                        budget governance for this agent.
                     </SheetDescription>
                 </SheetHeader>
 
-                <div className="flex-1 overflow-y-auto space-y-6 p-6 text-sm">
+                <div className="flex-1 space-y-6 overflow-y-auto p-6 text-sm">
                     {/* Basic Info */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
@@ -104,7 +129,12 @@ export function AgentNodeConfigDrawer({
                             <Input
                                 id="agent-name"
                                 value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        name: e.target.value,
+                                    })
+                                }
                             />
                         </div>
                         <div className="space-y-1.5">
@@ -112,7 +142,12 @@ export function AgentNodeConfigDrawer({
                             <Input
                                 id="agent-role"
                                 value={formData.role_title}
-                                onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        role_title: e.target.value,
+                                    })
+                                }
                             />
                         </div>
                     </div>
@@ -123,11 +158,15 @@ export function AgentNodeConfigDrawer({
                         <select
                             value={formData.agent_class}
                             onChange={(e) => {
-                                const selectedBp = blueprints.find((b) => b.class === e.target.value);
+                                const selectedBp = blueprints.find(
+                                    (b) => b.class === e.target.value,
+                                );
                                 setFormData({
                                     ...formData,
                                     agent_class: e.target.value,
-                                    enabled_tools: selectedBp ? selectedBp.default_tools : formData.enabled_tools,
+                                    enabled_tools: selectedBp
+                                        ? selectedBp.default_tools
+                                        : formData.enabled_tools,
                                 });
                             }}
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
@@ -148,7 +187,8 @@ export function AgentNodeConfigDrawer({
                                 value={formData.provider}
                                 onChange={(e) => {
                                     const nextProvider = e.target.value;
-                                    const available = PROVIDER_MODELS[nextProvider] || [];
+                                    const available =
+                                        PROVIDER_MODELS[nextProvider] || [];
                                     setFormData({
                                         ...formData,
                                         provider: nextProvider,
@@ -158,8 +198,12 @@ export function AgentNodeConfigDrawer({
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                             >
                                 <option value="gemini">Google Gemini</option>
-                                <option value="anthropic">Anthropic (Claude)</option>
-                                <option value="openai">OpenAI (GPT / o-series)</option>
+                                <option value="anthropic">
+                                    Anthropic (Claude)
+                                </option>
+                                <option value="openai">
+                                    OpenAI (GPT / o-series)
+                                </option>
                                 <option value="deepseek">DeepSeek</option>
                                 <option value="ollama">Ollama (Local)</option>
                             </select>
@@ -168,15 +212,24 @@ export function AgentNodeConfigDrawer({
                             <Label>Model Name</Label>
                             <select
                                 value={formData.model_name}
-                                onChange={(e) => setFormData({ ...formData, model_name: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        model_name: e.target.value,
+                                    })
+                                }
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                             >
-                                {(PROVIDER_MODELS[formData.provider] || []).map((m) => (
-                                    <option key={m.id} value={m.id}>
-                                        {m.name}
-                                    </option>
-                                ))}
-                                {!(PROVIDER_MODELS[formData.provider] || []).some((m) => m.id === formData.model_name) && (
+                                {(PROVIDER_MODELS[formData.provider] || []).map(
+                                    (m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name}
+                                        </option>
+                                    ),
+                                )}
+                                {!(
+                                    PROVIDER_MODELS[formData.provider] || []
+                                ).some((m) => m.id === formData.model_name) && (
                                     <option value={formData.model_name}>
                                         {formData.model_name}
                                     </option>
@@ -190,25 +243,39 @@ export function AgentNodeConfigDrawer({
                         <Label>Reasoning Effort (Thinking Budget)</Label>
                         <select
                             value={formData.reasoning_effort || ''}
-                            onChange={(e) => setFormData({ ...formData, reasoning_effort: e.target.value || null })}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    reasoning_effort: e.target.value || null,
+                                })
+                            }
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                         >
                             <option value="">Disabled / Default</option>
                             <option value="low">Low (Fast reasoning)</option>
                             <option value="medium">Medium (Standard)</option>
-                            <option value="high">High (Deep thinking for complex coding)</option>
+                            <option value="high">
+                                High (Deep thinking for complex coding)
+                            </option>
                         </select>
                     </div>
 
                     {/* System Instructions */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="instructions">Custom System Instructions</Label>
+                        <Label htmlFor="instructions">
+                            Custom System Instructions
+                        </Label>
                         <textarea
                             id="instructions"
                             rows={4}
                             value={formData.instructions || ''}
-                            onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                            className="w-full rounded-md border border-input bg-background p-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono text-xs"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    instructions: e.target.value,
+                                })
+                            }
+                            className="w-full rounded-md border border-input bg-background p-3 font-mono text-sm text-xs shadow-sm focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                             placeholder="Add specific guidelines, CAD preferences, or project requirements for this agent..."
                         />
                     </div>
@@ -216,41 +283,65 @@ export function AgentNodeConfigDrawer({
                     {/* Tools Selection & Human Approval */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <Label className="font-semibold">Tools & Governance</Label>
-                            <span className="text-xs text-muted-foreground">Check shield for Human Approval</span>
+                            <Label className="font-semibold">
+                                Tools & Governance
+                            </Label>
+                            <span className="text-xs text-muted-foreground">
+                                Check shield for Human Approval
+                            </span>
                         </div>
 
-                        <div className="rounded-lg border border-border p-3 space-y-2 bg-muted/20">
+                        <div className="space-y-2 rounded-lg border border-border bg-muted/20 p-3">
                             {availableTools.map((tool) => {
-                                const isEnabled = (formData.enabled_tools || []).includes(tool.class);
-                                const requiresApproval = (formData.tools_requiring_approval || []).includes(tool.class);
+                                const isEnabled = (
+                                    formData.enabled_tools || []
+                                ).includes(tool.class);
+                                const requiresApproval = (
+                                    formData.tools_requiring_approval || []
+                                ).includes(tool.class);
 
                                 return (
-                                    <div key={tool.class} className="flex items-center justify-between py-1 border-b border-border/40 last:border-0">
+                                    <div
+                                        key={tool.class}
+                                        className="flex items-center justify-between border-b border-border/40 py-1 last:border-0"
+                                    >
                                         <div className="flex items-center gap-2">
                                             <Checkbox
                                                 id={`tool-${tool.name}`}
                                                 checked={isEnabled}
-                                                onCheckedChange={() => handleToolToggle(tool.class)}
+                                                onCheckedChange={() =>
+                                                    handleToolToggle(tool.class)
+                                                }
                                             />
-                                            <label htmlFor={`tool-${tool.name}`} className="text-xs font-medium cursor-pointer">
+                                            <label
+                                                htmlFor={`tool-${tool.name}`}
+                                                className="cursor-pointer text-xs font-medium"
+                                            >
                                                 {tool.name}
-                                                <span className="block text-[10px] text-muted-foreground">{tool.description}</span>
+                                                <span className="block text-[10px] text-muted-foreground">
+                                                    {tool.description}
+                                                </span>
                                             </label>
                                         </div>
 
                                         {tool.approvable && isEnabled && (
                                             <button
                                                 type="button"
-                                                onClick={() => handleApprovalToggle(tool.class)}
+                                                onClick={() =>
+                                                    handleApprovalToggle(
+                                                        tool.class,
+                                                    )
+                                                }
                                                 className={`flex items-center gap-1 rounded px-2 py-0.5 text-[11px] transition-colors ${
                                                     requiresApproval
-                                                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-medium'
+                                                        ? 'bg-amber-500/20 font-medium text-amber-700 dark:text-amber-300'
                                                         : 'text-muted-foreground hover:bg-muted'
                                                 }`}
                                             >
                                                 <ShieldAlert className="h-3 w-3" />
-                                                {requiresApproval ? 'Approval Required' : 'Auto-Approve'}
+                                                {requiresApproval
+                                                    ? 'Approval Required'
+                                                    : 'Auto-Approve'}
                                             </button>
                                         )}
                                     </div>
@@ -262,38 +353,67 @@ export function AgentNodeConfigDrawer({
                     {/* Connected MCP Servers */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <Label className="font-semibold">Connected MCP Servers</Label>
-                            <span className="text-xs text-muted-foreground">{mcpServers.length} Available</span>
+                            <Label className="font-semibold">
+                                Connected MCP Servers
+                            </Label>
+                            <span className="text-xs text-muted-foreground">
+                                {mcpServers.length} Available
+                            </span>
                         </div>
 
-                        <div className="rounded-lg border border-border p-3 space-y-2 bg-muted/20">
+                        <div className="space-y-2 rounded-lg border border-border bg-muted/20 p-3">
                             {mcpServers.length === 0 ? (
                                 <p className="text-xs text-muted-foreground italic">
                                     No external MCP servers added yet.
                                 </p>
                             ) : (
                                 mcpServers.map((server) => {
-                                    const attachedIds = (formData.mcp_servers || []).map((s) => s.id);
-                                    const isAttached = attachedIds.includes(server.id);
+                                    const attachedIds = (
+                                        formData.mcp_servers || []
+                                    ).map((s) => s.id);
+                                    const isAttached = attachedIds.includes(
+                                        server.id,
+                                    );
 
                                     return (
-                                        <div key={server.id} className="flex items-center justify-between py-1 border-b border-border/40 last:border-0">
+                                        <div
+                                            key={server.id}
+                                            className="flex items-center justify-between border-b border-border/40 py-1 last:border-0"
+                                        >
                                             <div className="flex items-center gap-2">
                                                 <Checkbox
                                                     id={`mcp-server-${server.id}`}
                                                     checked={isAttached}
                                                     onCheckedChange={() => {
-                                                        const current = formData.mcp_servers || [];
-                                                        const updated = isAttached
-                                                            ? current.filter((s) => s.id !== server.id)
-                                                            : [...current, server];
-                                                        setFormData({ ...formData, mcp_servers: updated });
+                                                        const current =
+                                                            formData.mcp_servers ||
+                                                            [];
+                                                        const updated =
+                                                            isAttached
+                                                                ? current.filter(
+                                                                      (s) =>
+                                                                          s.id !==
+                                                                          server.id,
+                                                                  )
+                                                                : [
+                                                                      ...current,
+                                                                      server,
+                                                                  ];
+                                                        setFormData({
+                                                            ...formData,
+                                                            mcp_servers:
+                                                                updated,
+                                                        });
                                                     }}
                                                 />
-                                                <label htmlFor={`mcp-server-${server.id}`} className="text-xs font-medium cursor-pointer">
+                                                <label
+                                                    htmlFor={`mcp-server-${server.id}`}
+                                                    className="cursor-pointer text-xs font-medium"
+                                                >
                                                     {server.name}
-                                                    <span className="block text-[10px] text-muted-foreground font-mono">
-                                                        {server.transport} • {server.command_or_url}
+                                                    <span className="block font-mono text-[10px] text-muted-foreground">
+                                                        {server.transport} •{' '}
+                                                        {server.command_or_url}
                                                     </span>
                                                 </label>
                                             </div>
@@ -307,26 +427,40 @@ export function AgentNodeConfigDrawer({
                     {/* Hard Budget Controls */}
                     <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="max-budget">Max Budget per Task ($)</Label>
+                            <Label htmlFor="max-budget">
+                                Max Budget per Task ($)
+                            </Label>
                             <Input
                                 id="max-budget"
                                 type="number"
                                 step="0.5"
                                 value={formData.max_task_budget_usd || ''}
                                 onChange={(e) =>
-                                    setFormData({ ...formData, max_task_budget_usd: e.target.value ? parseFloat(e.target.value) : null })
+                                    setFormData({
+                                        ...formData,
+                                        max_task_budget_usd: e.target.value
+                                            ? parseFloat(e.target.value)
+                                            : null,
+                                    })
                                 }
                                 placeholder="5.00"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="max-tokens">Max Tokens per Run</Label>
+                            <Label htmlFor="max-tokens">
+                                Max Tokens per Run
+                            </Label>
                             <Input
                                 id="max-tokens"
                                 type="number"
                                 value={formData.max_tokens_per_run || ''}
                                 onChange={(e) =>
-                                    setFormData({ ...formData, max_tokens_per_run: e.target.value ? parseInt(e.target.value) : null })
+                                    setFormData({
+                                        ...formData,
+                                        max_tokens_per_run: e.target.value
+                                            ? parseInt(e.target.value)
+                                            : null,
+                                    })
                                 }
                                 placeholder="100000"
                             />
@@ -334,9 +468,13 @@ export function AgentNodeConfigDrawer({
                     </div>
                 </div>
 
-                <SheetFooter className="p-6 py-4 border-t border-border/80 bg-muted/15 flex flex-row items-center justify-between gap-3">
-                    <Button variant="destructive" size="sm" onClick={() => onDelete(formData.id)}>
-                        <Trash2 className="h-4 w-4 mr-1.5" />
+                <SheetFooter className="flex flex-row items-center justify-between gap-3 border-t border-border/80 bg-muted/15 p-6 py-4">
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onDelete(formData.id)}
+                    >
+                        <Trash2 className="mr-1.5 h-4 w-4" />
                         Delete Node
                     </Button>
                     <div className="flex gap-2">
@@ -344,7 +482,7 @@ export function AgentNodeConfigDrawer({
                             Cancel
                         </Button>
                         <Button size="sm" onClick={() => onSave(formData)}>
-                            <Save className="h-4 w-4 mr-1.5" />
+                            <Save className="mr-1.5 h-4 w-4" />
                             Save Node
                         </Button>
                     </div>

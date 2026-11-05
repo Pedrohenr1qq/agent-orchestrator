@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,10 +28,18 @@ interface Props {
     }) => Promise<void>;
 }
 
-export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Props) {
+export function NewTaskModal({
+    open,
+    agents,
+    workflowId,
+    onClose,
+    onSubmit,
+}: Props) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [assignedNodeId, setAssignedNodeId] = useState<string>(agents[0]?.id || '');
+    const [assignedNodeId, setAssignedNodeId] = useState<string>(
+        agents[0]?.id || '',
+    );
     const [budgetLimit, setBudgetLimit] = useState('3.00');
     const [attachments, setAttachments] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
@@ -37,7 +52,10 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target?.result) {
-                    setAttachments((prev) => [...prev, event.target!.result as string]);
+                    setAttachments((prev) => [
+                        ...prev,
+                        event.target!.result as string,
+                    ]);
                 }
             };
             reader.readAsDataURL(file);
@@ -56,7 +74,9 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                 title: title.trim(),
                 description: description.trim(),
                 attachments: attachments.length > 0 ? attachments : undefined,
-                budget_limit_usd: budgetLimit ? parseFloat(budgetLimit) : undefined,
+                budget_limit_usd: budgetLimit
+                    ? parseFloat(budgetLimit)
+                    : undefined,
             });
 
             setTitle('');
@@ -77,7 +97,8 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                         Create Autonomous Task
                     </DialogTitle>
                     <DialogDescription>
-                        Assign a goal to an agent. The agent will execute tools, create worktrees, and stream its reasoning.
+                        Assign a goal to an agent. The agent will execute tools,
+                        create worktrees, and stream its reasoning.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -94,7 +115,9 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="description">Requirements & User Story</Label>
+                        <Label htmlFor="description">
+                            Requirements & User Story
+                        </Label>
                         <textarea
                             id="description"
                             rows={4}
@@ -102,7 +125,7 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             required
-                            className="w-full rounded-md border border-input bg-background p-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            className="w-full rounded-md border border-input bg-background p-3 text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
 
@@ -112,7 +135,9 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                             <select
                                 id="assigned-agent"
                                 value={assignedNodeId}
-                                onChange={(e) => setAssignedNodeId(e.target.value)}
+                                onChange={(e) =>
+                                    setAssignedNodeId(e.target.value)
+                                }
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                             >
                                 {agents.map((ag) => (
@@ -146,7 +171,7 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                             accept="image/*"
                             multiple
                             onChange={handleFileUpload}
-                            className="block w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                            className="block w-full cursor-pointer text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-primary/10 file:px-2.5 file:py-1 file:text-xs file:font-semibold file:text-primary hover:file:bg-primary/20"
                         />
 
                         {attachments.length > 0 && (
@@ -156,7 +181,7 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                                         key={idx}
                                         src={img}
                                         alt={`Mockup ${idx}`}
-                                        className="h-14 w-14 object-cover rounded-md border border-border"
+                                        className="h-14 w-14 rounded-md border border-border object-cover"
                                     />
                                 ))}
                             </div>
@@ -164,11 +189,15 @@ export function NewTaskModal({ open, agents, workflowId, onClose, onSubmit }: Pr
                     </div>
 
                     <DialogFooter className="pt-3">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                        >
                             Cancel
                         </Button>
                         <Button type="submit" disabled={submitting}>
-                            <Send className="h-4 w-4 mr-1.5" />
+                            <Send className="mr-1.5 h-4 w-4" />
                             {submitting ? 'Dispatching...' : 'Dispatch Task'}
                         </Button>
                     </DialogFooter>

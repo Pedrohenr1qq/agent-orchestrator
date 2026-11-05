@@ -13,26 +13,67 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
+    services:
+      pgsql:
+        image: postgres:17
+        env:
+          POSTGRES_DB: agent_orchestrator
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: agent_orchestrator
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      REDIS_HOST: 127.0.0.1
+      WORKSPACE_ROOT_PATH: /tmp/workspaces
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
+        uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          extensions: pdo_pgsql, redis, pcntl, posix
           tools: composer:v2
           coverage: none
 
       - name: Setup Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Setup Application
-        run: composer setup
+      - name: Copy .env
+        run: cp .env.example .env
 
-      - name: Run CI Checks
-        run: composer ci:check
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Install NPM Dependencies & Build Assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Check Code Style (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Run Tests
+        run: php artisan test --compact
