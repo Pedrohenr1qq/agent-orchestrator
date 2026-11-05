@@ -21,6 +21,11 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+/agent_orchestrator
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
 /auth.json
 /.fleet
 /.idea
